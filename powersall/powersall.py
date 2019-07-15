@@ -2,13 +2,12 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-from statistics import mean
 import csv
 import argparse
 from pathlib import Path
+import datetime
 
-
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 def prep():
@@ -17,7 +16,7 @@ def prep():
                                      for specific date, example: powersall -d\
                                      "05-12-2019"')
     parser.add_argument('-d', '--date', dest='powerdate',
-                        help='yyyy-mm-dd', default='2019-07-06',
+                        help='yyyy-mm-dd', default='2019-01-19',
                         required=False)
     args = parser.parse_args()
     return args
@@ -25,7 +24,19 @@ def prep():
 
 def checkdate(powerdate):
     """Date parsing."""
-    datedata = pd.read_csv('~/powerball.csv', sep=",")['Date']
+    userinput = datetime.datetime.strptime(powerdate, '%Y-%m-%d')
+    datedata = pd.read_csv(
+        f'{Path.home()}/powerball.csv', sep=",")['Date'].tolist()
+    realdatelist = []
+    for item in datedata:
+        realdatelist.append(datetime.datetime.strptime(item, '%d-%B-%Y'))
+    # for item in realdatelist:
+    #     print(item.strftime("%Y-%m-%d"))
+    # if userinput in realdatelist:
+    #     print("FOUND")
+    return userinput
+
+    # print(datedata.tolist())
 
 
 def getnumbers():
@@ -43,7 +54,12 @@ def getnumbers():
         for item in soup.findAll("tr"):
             try:
                 alinkdate = item.find("a").contents
-                datefixer = "-".join([alinkdate[0].split()[1], alinkdate[2].split()[0],alinkdate[2].split()[1]])
+                if len(alinkdate[0].split()[1]) == 1:
+                    fixednum = f"{str(0)}{alinkdate[0].split()[1]}"
+                else:
+                    fixednum = alinkdate[0].split()[1]
+                datefixer = "-".join([fixednum,
+                                      alinkdate[2].split()[0], alinkdate[2].split()[1]])
                 # print(datefixer)
             except AttributeError:
                 continue
@@ -60,14 +76,12 @@ def getnumbers():
                 totals.append(sum(justcontents))
             except AttributeError:
                 continue
-            print(justcontents)
+            # print(justcontents)
             powerballs.append(int(justcontents[-1]))
             dates.append([alinkdate[0], alinkdate[2],
                           ','.join(map(str, justcontents))])
             spamwriter.writerow(
                 [datefixer] + list(map(int, justcontents)))
-    print(mean(totals))
-    print(dates[0])
 
     return powerballs, regballs
 
@@ -89,8 +103,6 @@ def getplot(data, name):
     plt.xlabel('variable X (bin size = 5)')
     plt.ylabel('count')
 
-    # plt.show()
-    # num = uuid4()
     plt.savefig(f'{name}.png', bbox_inches='tight')
     plt.close()
 
@@ -98,12 +110,21 @@ def getplot(data, name):
 def main():
     """Gets the powerball numbers."""
     args = prep()
-    from pathlib import Path
-
-    my_file = Path("~/powerball.csv")
+    my_file = Path(f'{Path.home()}/powerball.csv')
     if my_file.is_file():
-        checkdate(args.powerdate)
-    powerballdata, regularballdata = getnumbers()
+        userdate = checkdate(args.powerdate)
+        powerballdata = pd.read_csv(
+            f'{Path.home()}/powerball.csv', sep=",")['Powerball']
+        df = pd.read_csv(f'{Path.home()}/powerball.csv', sep=",")
+        print(df[df['Date'].str.contains(userdate.strftime("%d-%B-%Y"))])
+        regularballdata = df['choice 1'].values.tolist() + df['choice 2'].values.tolist() + \
+            df['choice 3'].values.tolist() + df['choice 4'].values.tolist() + \
+            df['choice 5'].values.tolist()
+    else:
+        powerballdata, regularballdata = getnumbers()
+        userdate = checkdate(args.powerdate)
+        df = pd.read_csv(f'{Path.home()}/powerball.csv', sep=",")
+        print(df[df['Date'].str.contains(userdate.strftime("%d-%B-%Y"))])
     getplot(regularballdata, "regular")
     getplot(powerballdata, "powerball")
 
