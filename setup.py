@@ -16,8 +16,8 @@ setup(
     description='file extension info',
     packages=['powersall'],
     py_modules=['powersall'],
-    keywords=['mimetype', 'file-extension',
-              'fileinfo', 'file-system', 'drive-info'],
+    keywords=['powerball', 'lottery',
+              'random-numbers', 'lotto', 'megamillions'],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
     include_package_data=True,
     install_requires=[
