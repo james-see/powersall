@@ -127,3 +127,6 @@ dmypy.json
 *.txt
 *.png
 *.csv
+*.vscode
+*.vscode/
+.vscode/*
