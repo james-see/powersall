@@ -1,11 +1,31 @@
 """Gets the powerball numbers."""
+import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 from statistics import mean
 import csv
+import argparse
+from pathlib import Path
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
+
+
+def prep():
+    """Get all the argparse stuff setup."""
+    parser = argparse.ArgumentParser(description='simple get powerball info\
+                                     for specific date, example: powersall -d\
+                                     "05-12-2019"')
+    parser.add_argument('-d', '--date', dest='powerdate',
+                        help='yyyy-mm-dd', default='2019-07-06',
+                        required=False)
+    args = parser.parse_args()
+    return args
+
+
+def checkdate(powerdate):
+    """Date parsing."""
+    datedata = pd.read_csv('~/powerball.csv', sep=",")['Date']
 
 
 def getnumbers():
@@ -15,15 +35,16 @@ def getnumbers():
     regballs = []
     totals = []
     dates = []
-    with open('powerball.csv', 'w', newline='') as csvfile:
+    with open(f'{Path.home()}/powerball.csv', 'w+', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow(["Day", "Month", "Year", "choice 1", "choice 2",
+        spamwriter.writerow(["Date", "choice 1", "choice 2",
                              "choice 3", "choice 4", "choice 5", "Powerball"])
         for item in soup.findAll("tr"):
             try:
                 alinkdate = item.find("a").contents
-                print(alinkdate[0], alinkdate[2])
+                datefixer = "-".join([alinkdate[0].split()[1], alinkdate[2].split()[0],alinkdate[2].split()[1]])
+                # print(datefixer)
             except AttributeError:
                 continue
             # print(item.find("a"))
@@ -44,7 +65,7 @@ def getnumbers():
             dates.append([alinkdate[0], alinkdate[2],
                           ','.join(map(str, justcontents))])
             spamwriter.writerow(
-                [alinkdate[0]] + alinkdate[2].split() + list(map(int, justcontents)))
+                [datefixer] + list(map(int, justcontents)))
     print(mean(totals))
     print(dates[0])
 
@@ -76,6 +97,12 @@ def getplot(data, name):
 
 def main():
     """Gets the powerball numbers."""
+    args = prep()
+    from pathlib import Path
+
+    my_file = Path("~/powerball.csv")
+    if my_file.is_file():
+        checkdate(args.powerdate)
     powerballdata, regularballdata = getnumbers()
     getplot(regularballdata, "regular")
     getplot(powerballdata, "powerball")
