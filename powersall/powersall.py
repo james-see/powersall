@@ -5,6 +5,9 @@ from statistics import mean
 import csv
 
 
+__version__ = "1.0.0"
+
+
 def getnumbers():
     soup = BeautifulSoup(requests.get(
         "https://www.lottonumbers.com/past-powerball-results").text, "lxml")
