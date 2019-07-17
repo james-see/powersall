@@ -15,7 +15,7 @@ setup(
     license='MIT',
     description='file extension info',
     packages=['powersall'],
-    py_modules=['powersall'],
+    py_modules=['powersall', 'functions'],
     keywords=['powerball', 'lottery',
               'random-numbers', 'lotto', 'megamillions'],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
