@@ -6,9 +6,9 @@ import csv
 import argparse
 from pathlib import Path
 import datetime
-from functions import randomeyes
+from .functions import randomeyes
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 
 def prep():
