@@ -130,5 +130,5 @@ dmypy.json
 *.vscode
 *.vscode/
 .vscode/*
-.json
+*.json
 powersall/*.json
