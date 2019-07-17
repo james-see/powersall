@@ -22,7 +22,11 @@ setup(
     include_package_data=True,
     install_requires=[
         'beautifulsoup4',
-        'requests'
+        'requests',
+        'lxml',
+        'pandas',
+        'argparse',
+        'pathlib'
     ],
     entry_points={
         'console_scripts': [

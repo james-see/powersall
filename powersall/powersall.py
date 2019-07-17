@@ -8,7 +8,7 @@ from pathlib import Path
 import datetime
 from functions import randomeyes
 
-__version__ = "1.0.2"
+__version__ = "1.0.5"
 
 
 def prep():
