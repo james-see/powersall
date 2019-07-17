@@ -26,7 +26,8 @@ setup(
         'lxml',
         'pandas',
         'argparse',
-        'pathlib'
+        'pathlib',
+        'markovify'
     ],
     entry_points={
         'console_scripts': [
