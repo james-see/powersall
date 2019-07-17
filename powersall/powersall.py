@@ -6,6 +6,7 @@ import csv
 import argparse
 from pathlib import Path
 import datetime
+from functions import randomeyes
 
 __version__ = "1.0.2"
 
@@ -18,6 +19,11 @@ def prep():
     parser.add_argument('-d', '--date', dest='powerdate',
                         help='yyyy-mm-dd', default='2019-01-19',
                         required=False)
+    parser.add_argument('-p', '--pick', dest='pick',
+                        help='pick your next powerball card',
+                        action="store_true", default=False)
+    parser.add_argument('-s', '--save-db', dest='db',
+                        action="store_true", default=False)
     args = parser.parse_args()
     return args
 
@@ -111,6 +117,11 @@ def main():
     """Gets the powerball numbers."""
     args = prep()
     my_file = Path(f'{Path.home()}/powerball.csv')
+    if my_file.is_file() and args.pick:
+        with open(f'{Path.home()}/powerball.csv') as f:
+            powerballdata = list(csv.reader(f))[1:]
+            print(randomeyes(args.db))
+            exit()
     if my_file.is_file():
         userdate = checkdate(args.powerdate)
         powerballdata = pd.read_csv(
