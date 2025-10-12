@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Powerball Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .btn-primary:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features {
+            background: white;
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        /* Usage Section */
+        .usage {
+            background: #f8f9fa;
+            padding: 4rem 0;
+        }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .usage-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #2563eb;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+
+        .command-list {
+            list-style: none;
+        }
+
+        .command-item {
+            background: white;
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .command-item code {
+            background: #e5e7eb;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Footer */
+        footer {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .usage-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">🎲 Powerball Analysis Tool</a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#usage">Usage</a></li>
+                <li><a href="https://github.com/jamesacampbell/powersall">GitHub</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Advanced Powerball Lottery Analysis</h1>
+                <p>Make informed decisions with comprehensive Powerball data analysis, frequency patterns, and smart number generation powered by statistical analysis.</p>
+                <div class="cta-buttons">
+                    <a href="#features" class="btn btn-primary">Explore Features</a>
+                    <a href="https://github.com/james-see/powersall" class="btn btn-secondary">View Source</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Frequency Analysis</h3>
+                        <p>Analyze number frequency patterns across thousands of Powerball draws to identify hot and cold numbers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔥</div>
+                        <h3 class="feature-title">Hot/Cold Detection</h3>
+                        <p>Identify numbers that are trending hot (frequently drawn) or cold (rarely drawn) in recent games.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3 class="feature-title">Pattern Recognition</h3>
+                        <p>Discover patterns like odd/even distributions, sum ranges, and consecutive number occurrences.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎲</div>
+                        <h3 class="feature-title">Smart Generator</h3>
+                        <p>Generate numbers using statistical weighting based on historical data and recent trends.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖥️</div>
+                        <h3 class="feature-title">Web Interface</h3>
+                        <p>Use the interactive web interface for intuitive data exploration and visualization.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">Modern Python</h3>
+                        <p>Built with Python 3.11+ and modern package management using uv for optimal performance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="usage" class="usage">
+            <div class="container">
+                <h2 class="section-title" style="color: white;">Getting Started</h2>
+                <div class="usage-grid">
+                    <div class="usage-column">
+                        <h3>Installation</h3>
+                        <div class="code-block">
+# Using uv (recommended)<br>
+uv pip install powersall<br><br>
+# Or using pip<br>
+pip install powersall
+                        </div>
+
+                        <h3>Basic Commands</h3>
+                        <ul class="command-list">
+                            <li class="command-item">
+                                <code>powersall --date 2023-12-01</code>
+                                <span>Show numbers for a specific date</span>
+                            </li>
+                            <li class="command-item">
+                                <code>powersall --pick</code>
+                                <span>Generate random numbers</span>
+                            </li>
+                            <li class="command-item">
+                                <code>powersall --analysis</code>
+                                <span>Show frequency analysis</span>
+                            </li>
+                            <li class="command-item">
+                                <code>powersall --hot-cold</code>
+                                <span>Show hot/cold numbers</span>
+                            </li>
+                            <li class="command-item">
+                                <code>powersall --patterns</code>
+                                <span>Show pattern analysis</span>
+                            </li>
+                            <li class="command-item">
+                                <code>powersall --web</code>
+                                <span>Launch web interface</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="usage-column">
+                        <h3>Development</h3>
+                        <div class="code-block">
+# Clone the repository<br>
+git clone https://github.com/jamesacampbell/powersall.git<br>
+cd powersall<br><br>
+# Install with uv<br>
+uv pip install -e .[dev]<br><br>
+# Run tests<br>
+uv run pytest<br><br>
+# Build package<br>
+uv build
+                        </div>
+
+                        <h3>Version Management</h3>
+                        <div class="code-block">
+# Bump version<br>
+make bump-version-patch<br>
+make bump-version-minor<br>
+make bump-version-major<br><br>
+# Manual version setting<br>
+uv run bump-version --set 2.1.0
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Powerball Analysis Tool. Built with modern web technologies.</p>
+                <div class="footer-links">
+                    <a href="https://github.com/james-see/powersall">GitHub</a>
+                    <a href="https://pypi.org/project/powersall/">PyPI</a>
+                    <a href="#features">Features</a>
+                </div>
+        </div>
+    </footer>
+</body>
+</html>
