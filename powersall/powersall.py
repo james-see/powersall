@@ -78,49 +78,148 @@ def checkdate(powerdate):
 
 
 def getnumbers():
-    soup = BeautifulSoup(requests.get(
-        "https://www.lottonumbers.com/past-powerball-results").text, "lxml")
+    """Fetch Powerball numbers from website with robust error handling."""
+    try:
+        # Add headers to avoid being blocked
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(
+            "https://www.lottonumbers.com/powerball/past-numbers",
+            headers=headers,
+            timeout=10
+        )
+        response.raise_for_status()  # Raise an exception for bad status codes
+
+        soup = BeautifulSoup(response.text, "lxml")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching Powerball data: {e}")
+        print("Please check your internet connection or try again later.")
+        return [], []
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return [], []
+
     powerballs = []
     regballs = []
     totals = []
     dates = []
+
     with open(f'{Path.home()}/powerball.csv', 'w+', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
         spamwriter.writerow(["Date", "choice 1", "choice 2",
                              "choice 3", "choice 4", "choice 5", "Powerball"])
-        for item in soup.findAll("tr"):
-            try:
-                alinkdate = item.find("a").contents
-                if len(alinkdate[0].split()[1]) == 1:
-                    fixednum = f"{str(0)}{alinkdate[0].split()[1]}"
-                else:
-                    fixednum = alinkdate[0].split()[1]
-                datefixer = "-".join([fixednum,
-                                      alinkdate[2].split()[0], alinkdate[2].split()[1]])
-                # print(datefixer)
-            except AttributeError:
-                continue
-            # print(item.find("a"))
-            try:
-                numbers = item.find("ul").find_all("li")
-                del numbers[-1]
-                justcontents = []
-                for val in numbers:
-                    justcontents.append(int(val.contents[0]))
-                    regballs.append(int(val.contents[0]))
-                del regballs[-1]
-                # print(sum(justcontents))
-                totals.append(sum(justcontents))
-            except AttributeError:
-                continue
-            # print(justcontents)
-            powerballs.append(int(justcontents[-1]))
-            dates.append([alinkdate[0], alinkdate[2],
-                          ','.join(map(str, justcontents))])
-            spamwriter.writerow(
-                [datefixer] + list(map(int, justcontents)))
 
+        # Find the results table
+        results_table = soup.find("table", class_="past-results")
+        if not results_table:
+            print("Could not find results table on the webpage")
+            return [], []
+
+        # Process each row in the table
+        for row in results_table.find_all("tr"):
+            # Skip header row
+            if row.find("th"):
+                continue
+
+            try:
+                # Get date from the date cell
+                date_cell = row.find("td", class_="date-row")
+                if not date_cell:
+                    continue
+
+                date_text = date_cell.get_text().strip()
+                if not date_text:
+                    continue
+
+                # Parse date (format: "Sat, Oct 11 2025")
+                date_parts = date_text.replace(",", "").split()
+                if len(date_parts) < 4:
+                    continue
+
+                day_name = date_parts[0]
+                month_name = date_parts[1]
+                day_num = date_parts[2]
+                year = date_parts[3]
+
+                # Convert month name to number
+                month_map = {
+                    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+                    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+                    'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+                }
+
+                month_num = month_map.get(month_name, '01')
+
+                # Handle single digit days
+                if len(day_num) == 1:
+                    day_num = f"0{day_num}"
+
+                datefixer = f"{year}-{month_num}-{day_num}"
+
+            except (AttributeError, IndexError, KeyError, ValueError) as e:
+                # Skip malformed date rows
+                continue
+
+            try:
+                # Get numbers from the balls cell
+                balls_cell = row.find("td", class_="balls-row")
+                if not balls_cell:
+                    continue
+
+                balls_ul = balls_cell.find("ul", class_="balls")
+                if not balls_ul:
+                    continue
+
+                # Get all ball elements
+                ball_elements = balls_ul.find_all("li", class_="ball")
+
+                # Separate regular balls from special balls (powerball, power-play)
+                regular_balls = []
+                powerball = None
+                powerplay = None
+
+                for ball in ball_elements:
+                    ball_class = ball.get("class", [])
+                    ball_text = ball.get_text().strip()
+
+                    if "powerball" in ball_class:
+                        if ball_text.isdigit():
+                            powerball = int(ball_text)
+                    elif "power-play" in ball_class:
+                        if ball_text.isdigit():
+                            powerplay = int(ball_text)
+                    else:
+                        # Regular ball
+                        if ball_text.isdigit():
+                            regular_balls.append(int(ball_text))
+
+                if len(regular_balls) != 5 or powerball is None:
+                    continue
+
+                # Sort regular balls for consistency
+                regular_balls.sort()
+
+                # Add to our collections
+                regballs.extend(regular_balls)
+                powerballs.append(powerball)
+
+                # Write to CSV
+                csv_row = [datefixer] + regular_balls + [powerball]
+                if powerplay is not None:
+                    csv_row.append(powerplay)
+
+                spamwriter.writerow(csv_row)
+
+                # For compatibility with old format
+                totals.append(sum(regular_balls))
+
+            except (AttributeError, IndexError, ValueError) as e:
+                # Skip malformed number rows
+                continue
+
+    print(f"Successfully downloaded {len(powerballs)} Powerball records")
     return powerballs, regballs
 
 
