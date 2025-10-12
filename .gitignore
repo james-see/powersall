@@ -77,13 +77,15 @@ Thumbs.db
 
 # Project specific
 powerball.csv
-*.json
 *.png
 *.html
 *.csv
 powerball_app.py
 node_modules/
 *.log
+
+# Keep JSON files in docs folder for npm
+!docs/package*.json
 
 # Documentation builds
 docs/dist/

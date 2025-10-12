@@ -3,7 +3,7 @@ name = "powersall"
 version = "2.0.1"
 description = "Advanced Powerball lottery analysis and number generator tool"
 authors = [
-    {name = "James Campbell", email = "jc@normail.co"},
+    {name = "James Campbell", email = "james@jamescampbell.us"},
 ]
 readme = "README.md"
 requires-python = ">=3.11"
