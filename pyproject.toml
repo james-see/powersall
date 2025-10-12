@@ -1,6 +1,6 @@
 [project]
 name = "powersall"
-version = "2.0.2"
+version = "2.0.3"
 description = "Advanced Powerball lottery analysis and number generator tool"
 authors = [
     {name = "James Campbell", email = "james@jamescampbell.us"},
