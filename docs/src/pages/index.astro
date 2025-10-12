@@ -1,0 +1,158 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PowerballChart from '../components/PowerballChart.jsx';
+---
+
+<Layout title="Powerball Analysis Tool">
+	<section class="hero bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+		<div class="container mx-auto px-4 text-center">
+			<h1 class="text-5xl font-bold mb-6">Powerball Analysis Tool</h1>
+			<p class="text-xl mb-8 max-w-3xl mx-auto">
+				Advanced lottery analysis and number generator powered by data science and statistical analysis.
+				Make informed decisions with comprehensive Powerball data analysis.
+			</p>
+			<div class="flex flex-col sm:flex-row gap-4 justify-center">
+				<a href="#features" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+					Explore Features
+				</a>
+				<a href="https://github.com/jamesacampbell/powersall" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+					View on GitHub
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<section id="features" class="py-16">
+		<div class="container mx-auto px-4">
+			<h2 class="text-3xl font-bold text-center mb-12">Features</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+				<div class="feature-card bg-white p-6 rounded-lg shadow-lg">
+					<div class="text-4xl mb-4">📊</div>
+					<h3 class="text-xl font-semibold mb-3">Frequency Analysis</h3>
+					<p class="text-gray-600">
+						Analyze number frequency patterns across thousands of Powerball draws to identify hot and cold numbers.
+					</p>
+				</div>
+				<div class="feature-card bg-white p-6 rounded-lg shadow-lg">
+					<div class="text-4xl mb-4">🔥</div>
+					<h3 class="text-xl font-semibold mb-3">Hot/Cold Numbers</h3>
+					<p class="text-gray-600">
+						Identify numbers that are trending hot (frequently drawn) or cold (rarely drawn) in recent games.
+					</p>
+				</div>
+				<div class="feature-card bg-white p-6 rounded-lg shadow-lg">
+					<div class="text-4xl mb-4">📈</div>
+					<h3 class="text-xl font-semibold mb-3">Pattern Detection</h3>
+					<p class="text-gray-600">
+						Discover patterns like odd/even distributions, sum ranges, and consecutive number occurrences.
+					</p>
+				</div>
+				<div class="feature-card bg-white p-6 rounded-lg shadow-lg">
+					<div class="text-4xl mb-4">🎲</div>
+					<h3 class="text-xl font-semibold mb-3">Smart Number Generator</h3>
+					<p class="text-gray-600">
+						Generate numbers using statistical weighting based on historical data and recent trends.
+					</p>
+				</div>
+				<div class="feature-card bg-white p-6 rounded-lg shadow-lg">
+					<div class="text-4xl mb-4">📊</div>
+					<h3 class="text-xl font-semibold mb-3">Interactive Visualizations</h3>
+					<p class="text-gray-600">
+						Explore data through interactive charts and graphs built with modern web technologies.
+					</p>
+				</div>
+				<div class="feature-card bg-white p-6 rounded-lg shadow-lg">
+					<div class="text-4xl mb-4">🖥️</div>
+					<h3 class="text-xl font-semibold mb-3">Web Interface</h3>
+					<p class="text-gray-600">
+						Use the Streamlit web interface for an intuitive, interactive analysis experience.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="analysis" class="py-16 bg-gray-100">
+		<div class="container mx-auto px-4">
+			<h2 class="text-3xl font-bold text-center mb-12">Live Analysis Preview</h2>
+			<div class="bg-white p-8 rounded-lg shadow-lg">
+				<PowerballChart client:load />
+			</div>
+		</div>
+	</section>
+
+	<section id="usage" class="py-16">
+		<div class="container mx-auto px-4">
+			<h2 class="text-3xl font-bold text-center mb-12">Getting Started</h2>
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+				<div>
+					<h3 class="text-2xl font-semibold mb-6">Installation</h3>
+					<div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm mb-6">
+						<div># Using uv (recommended)</div>
+						<div>uv pip install powersall</div>
+						<br>
+						<div># Or using pip</div>
+						<div>pip install powersall</div>
+					</div>
+
+					<h3 class="text-2xl font-semibold mb-6">Basic Usage</h3>
+					<div class="space-y-4">
+						<div class="flex items-start space-x-3">
+							<code class="bg-gray-200 px-2 py-1 rounded text-sm">powersall --date 2023-12-01</code>
+							<span class="text-gray-600">Show numbers for a specific date</span>
+						</div>
+						<div class="flex items-start space-x-3">
+							<code class="bg-gray-200 px-2 py-1 rounded text-sm">powersall --pick</code>
+							<span class="text-gray-600">Generate random numbers</span>
+						</div>
+						<div class="flex items-start space-x-3">
+							<code class="bg-gray-200 px-2 py-1 rounded text-sm">powersall --analysis</code>
+							<span class="text-gray-600">Show frequency analysis</span>
+						</div>
+						<div class="flex items-start space-x-3">
+							<code class="bg-gray-200 px-2 py-1 rounded text-sm">powersall --hot-cold</code>
+							<span class="text-gray-600">Show hot/cold numbers</span>
+						</div>
+						<div class="flex items-start space-x-3">
+							<code class="bg-gray-200 px-2 py-1 rounded text-sm">powersall --patterns</code>
+							<span class="text-gray-600">Show pattern analysis</span>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<h3 class="text-2xl font-semibold mb-6">Web Interface</h3>
+					<p class="text-gray-600 mb-4">
+						For a more interactive experience, use the Streamlit web interface:
+					</p>
+					<div class="bg-gray-200 p-4 rounded-lg font-mono text-sm mb-6">
+						<div>powersall --web</div>
+					</div>
+
+					<h3 class="text-2xl font-semibold mb-6">Development</h3>
+					<div class="bg-gray-200 p-4 rounded-lg font-mono text-sm">
+						<div># Clone the repository</div>
+						<div>git clone https://github.com/jamesacampbell/powersall.git</div>
+						<div>cd powersall</div>
+						<br>
+						<div># Install with uv</div>
+						<div>uv pip install -e .</div>
+						<br>
+						<div># Run tests</div>
+						<div>uv run pytest</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.feature-card {
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+	}
+	.feature-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+	}
+</style>

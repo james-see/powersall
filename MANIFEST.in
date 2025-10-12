@@ -1,0 +1,10 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include Makefile
+recursive-include powersall *.py
+recursive-include scripts *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+prune __pycache__
+prune *.pyc
