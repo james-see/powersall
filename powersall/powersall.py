@@ -67,11 +67,17 @@ def checkdate(powerdate):
         f'{Path.home()}/powerball.csv', sep=",")['Date'].tolist()
     realdatelist = []
     for item in datedata:
-        realdatelist.append(datetime.datetime.strptime(item, '%d-%B-%Y'))
-    # for item in realdatelist:
-    #     print(item.strftime("%Y-%m-%d"))
-    # if userinput in realdatelist:
-    #     print("FOUND")
+        # Handle both old format (%d-%B-%Y) and new format (%Y-%m-%d)
+        try:
+            # Try new format first (YYYY-MM-DD)
+            realdatelist.append(datetime.datetime.strptime(str(item), '%Y-%m-%d'))
+        except ValueError:
+            try:
+                # Fall back to old format (DD-MMM-YYYY)
+                realdatelist.append(datetime.datetime.strptime(str(item), '%d-%B-%Y'))
+            except ValueError:
+                # Skip invalid dates
+                continue
     return userinput
 
     # print(datedata.tolist())
@@ -109,7 +115,7 @@ def getnumbers():
         spamwriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
         spamwriter.writerow(["Date", "choice 1", "choice 2",
-                             "choice 3", "choice 4", "choice 5", "Powerball"])
+                             "choice 3", "choice 4", "choice 5", "Powerball", "PowerPlay"])
 
         # Find the results table
         results_table = soup.find("table", class_="past-results")
@@ -205,11 +211,9 @@ def getnumbers():
                 regballs.extend(regular_balls)
                 powerballs.append(powerball)
 
-                # Write to CSV
-                csv_row = [datefixer] + regular_balls + [powerball]
-                if powerplay is not None:
-                    csv_row.append(powerplay)
-
+                # Write to CSV (always include PowerPlay column)
+                powerplay_value = powerplay if powerplay is not None else ""
+                csv_row = [datefixer] + regular_balls + [powerball, powerplay_value]
                 spamwriter.writerow(csv_row)
 
                 # For compatibility with old format
@@ -389,7 +393,13 @@ def main():
         print("Downloading Powerball data...")
         getnumbers()
 
-    df = pd.read_csv(f'{Path.home()}/powerball.csv', sep=",")
+    df = pd.read_csv(f'{Path.home()}/powerball.csv', sep=",", dtype=str)
+
+    # Convert numeric columns to integers for analysis
+    numeric_columns = ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5', 'Powerball', 'PowerPlay']
+    for col in numeric_columns:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
 
     # Handle different modes
     if args.pick:
@@ -422,10 +432,16 @@ def main():
     # Default behavior: show specific date
     try:
         userdate = checkdate(args.powerdate)
-        result = df[df['Date'].str.contains(userdate.strftime("%d-%B-%Y"))]
+        # Search for the date in YYYY-MM-DD format (new format)
+        target_date = userdate.strftime("%Y-%m-%d")
+        # Ensure Date column is treated as string for pattern matching
+        result = df[df['Date'].astype(str).str.contains(target_date)]
         if result.empty:
             print(f"No data found for date: {args.powerdate}")
             print("Available dates range from the data in powerball.csv")
+            # Show available dates for debugging
+            available_dates = df['Date'].astype(str).unique()[:10]  # Show first 10 dates
+            print(f"Available date formats: {available_dates}")
         else:
             print(f"Powerball numbers for {args.powerdate}:")
             print(result.to_string(index=False))
