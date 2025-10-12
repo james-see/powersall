@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # Python dependencies (uv)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "james-see"
+    assignees:
+      - "james-see"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # Node.js dependencies (npm) for docs
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "james-see"
+    assignees:
+      - "james-see"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    ignore:
+      # Ignore esbuild security updates due to Astro version constraints
+      - dependency-name: "esbuild"
+        update-types: ["version-update:semver-patch", "version-update:semver-minor"]
