@@ -31,9 +31,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jamesacampbell/powersall"
-Repository = "https://github.com/jamesacampbell/powersall"
-Documentation = "https://jamesacampbell.github.io/powersall"
+Homepage = "https://github.com/james-see/powersall"
+Repository = "https://github.com/james-see/powersall"
+Documentation = "https://james-see.github.io/powersall"
 
 [project.scripts]
 powersall = "powersall.powersall:main"

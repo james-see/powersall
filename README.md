@@ -2,7 +2,7 @@
 
 ![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-green.svg)](https://jamesacampbell.github.io/powersall)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-green.svg)](https://james-see.github.io/powersall)
 
 Advanced Powerball lottery analysis and number generator tool with comprehensive statistical analysis, pattern detection, and interactive visualizations.
 
@@ -41,7 +41,7 @@ pip install powersall
 
 ```bash
 # Clone the repository
-git clone https://github.com/jamesacampbell/powersall.git
+git clone https://github.com/james-see/powersall.git
 cd powersall
 
 # Install with uv (recommended)
@@ -264,7 +264,7 @@ twine upload dist/*
 
 ## Documentation
 
-- **📖 [GitHub Pages Site](https://jamesacampbell.github.io/powersall)**: Interactive documentation and demos
+- **📖 [GitHub Pages Site](https://james-see.github.io/powersall)**: Interactive documentation and demos
 - **🔧 API Reference**: Comprehensive API documentation available in the GitHub Pages site
 - **💡 Examples**: Usage examples and tutorials
 
@@ -282,8 +282,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- **🐛 Issues**: [GitHub Issues](https://github.com/jamesacampbell/powersall/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/jamesacampbell/powersall/discussions)
+- **🐛 Issues**: [GitHub Issues](https://github.com/james-see/powersall/issues)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/james-see/powersall/discussions)
 - **📧 Email**: jc@normail.co
 
 ## Changelog
