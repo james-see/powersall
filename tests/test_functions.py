@@ -1,11 +1,15 @@
-import pytest
-import pandas as pd
 import json
-from datetime import datetime
 from collections import Counter
+
+import pandas as pd
+import pytest
+
 from powersall.functions import (
-    randomeyes, analyze_frequency, get_hot_cold_numbers,
-    detect_patterns, generate_weighted_random
+    analyze_frequency,
+    detect_patterns,
+    generate_weighted_random,
+    get_hot_cold_numbers,
+    randomeyes,
 )
 
 
@@ -16,9 +20,9 @@ class TestRandomEyes:
         """Test that randomeyes returns a dictionary with correct structure."""
         result = randomeyes()
         assert isinstance(result, dict)
-        assert all(key in result for key in [1, 2, 3, 4, 5, 'powerball'])
+        assert all(key in result for key in [1, 2, 3, 4, 5, "powerball"])
         assert all(isinstance(num, int) for num in [result[i] for i in range(1, 6)])
-        assert 1 <= result['powerball'] <= 26
+        assert 1 <= result["powerball"] <= 26
 
     def test_randomeyes_unique_numbers(self):
         """Test that regular numbers are unique."""
@@ -29,8 +33,8 @@ class TestRandomEyes:
 
     def test_randomeyes_save_db(self):
         """Test that save functionality creates a JSON file."""
-        import os
         import glob
+        import os
 
         # Clean up any existing files
         pattern = "selection_*.json"
@@ -46,10 +50,10 @@ class TestRandomEyes:
         assert len(files) == 1
 
         # Verify file contents
-        with open(files[0], 'r') as f:
+        with open(files[0]) as f:
             data = json.load(f)
-            assert 'results' in data
-            assert data['results'] == result
+            assert "results" in data
+            assert data["results"] == {str(key): value for key, value in result.items()}
 
         # Clean up
         os.remove(files[0])
@@ -62,13 +66,13 @@ class TestAnalyzeFrequency:
     def sample_dataframe(self):
         """Create a sample DataFrame for testing."""
         data = {
-            'Date': ['01-Jan-2023', '02-Jan-2023', '03-Jan-2023'],
-            'choice 1': [5, 12, 23],
-            'choice 2': [15, 25, 35],
-            'choice 3': [25, 35, 45],
-            'choice 4': [35, 45, 55],
-            'choice 5': [45, 55, 65],
-            'Powerball': [10, 15, 20]
+            "Date": ["01-Jan-2023", "02-Jan-2023", "03-Jan-2023"],
+            "choice 1": [5, 12, 23],
+            "choice 2": [15, 25, 35],
+            "choice 3": [25, 35, 45],
+            "choice 4": [35, 45, 55],
+            "choice 5": [45, 55, 65],
+            "Powerball": [10, 15, 20],
         }
         return pd.DataFrame(data)
 
@@ -97,15 +101,15 @@ class TestHotColdNumbers:
     def sample_dataframe_large(self):
         """Create a larger sample DataFrame for testing."""
         # Create a DataFrame with more realistic data
-        dates = pd.date_range('2023-01-01', periods=100, freq='D')
+        dates = pd.date_range("2023-01-01", periods=100, freq="D")
         data = {
-            'Date': dates.strftime('%d-%b-%Y'),
-            'choice 1': [1, 2, 3, 4, 5] * 20,
-            'choice 2': [6, 7, 8, 9, 10] * 20,
-            'choice 3': [11, 12, 13, 14, 15] * 20,
-            'choice 4': [16, 17, 18, 19, 20] * 20,
-            'choice 5': [21, 22, 23, 24, 25] * 20,
-            'Powerball': [1, 2, 3, 4, 5] * 20
+            "Date": dates.strftime("%d-%b-%Y"),
+            "choice 1": [1, 2, 3, 4, 5] * 20,
+            "choice 2": [6, 7, 8, 9, 10] * 20,
+            "choice 3": [11, 12, 13, 14, 15] * 20,
+            "choice 4": [16, 17, 18, 19, 20] * 20,
+            "choice 5": [21, 22, 23, 24, 25] * 20,
+            "Powerball": [1, 2, 3, 4, 5] * 20,
         }
         return pd.DataFrame(data)
 
@@ -130,13 +134,13 @@ class TestDetectPatterns:
     def pattern_dataframe(self):
         """Create a DataFrame with specific patterns for testing."""
         data = {
-            'Date': ['01-Jan-2023', '02-Jan-2023', '03-Jan-2023', '04-Jan-2023'],
-            'choice 1': [1, 2, 3, 4],    # All odd, all odd, all odd, all even
-            'choice 2': [3, 4, 5, 6],    # Odd, even, odd, even
-            'choice 3': [5, 6, 7, 8],    # Odd, even, odd, even
-            'choice 4': [7, 8, 9, 10],   # Odd, even, odd, even
-            'choice 5': [9, 10, 11, 12], # Odd, even, odd, even
-            'Powerball': [2, 4, 6, 8]     # All even
+            "Date": ["01-Jan-2023", "02-Jan-2023", "03-Jan-2023", "04-Jan-2023"],
+            "choice 1": [1, 2, 3, 4],  # All odd, all odd, all odd, all even
+            "choice 2": [3, 4, 5, 6],  # Odd, even, odd, even
+            "choice 3": [5, 6, 7, 8],  # Odd, even, odd, even
+            "choice 4": [7, 8, 9, 10],  # Odd, even, odd, even
+            "choice 5": [9, 10, 11, 12],  # Odd, even, odd, even
+            "Powerball": [2, 4, 6, 8],  # All even
         }
         return pd.DataFrame(data)
 
@@ -164,19 +168,21 @@ class TestGenerateWeightedRandom:
         """Create a DataFrame with frequency-biased data."""
         # Create data where number 1 appears more frequently
         data = {
-            'Date': ['01-Jan-2023'] * 10,
-            'choice 1': [1, 1, 1, 2, 2, 3, 4, 5, 6, 7],
-            'choice 2': [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-            'choice 3': [18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
-            'choice 4': [28, 29, 30, 31, 32, 33, 34, 35, 36, 37],
-            'choice 5': [38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
-            'Powerball': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            "Date": ["01-Jan-2023"] * 10,
+            "choice 1": [1, 1, 1, 2, 2, 3, 4, 5, 6, 7],
+            "choice 2": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+            "choice 3": [18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+            "choice 4": [28, 29, 30, 31, 32, 33, 34, 35, 36, 37],
+            "choice 5": [38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
+            "Powerball": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         }
         return pd.DataFrame(data)
 
     def test_generate_weighted_random_structure(self, frequency_dataframe):
         """Test that generate_weighted_random returns correct structure."""
-        regular, powerball = generate_weighted_random(frequency_dataframe, use_hot_cold=True)
+        regular, powerball = generate_weighted_random(
+            frequency_dataframe, use_hot_cold=True
+        )
 
         assert isinstance(regular, list)
         assert len(regular) == 5
@@ -192,13 +198,17 @@ class TestGenerateWeightedRandom:
         # Generate multiple samples with weighting
         weighted_samples = []
         for _ in range(100):
-            regular, _ = generate_weighted_random(frequency_dataframe, use_hot_cold=True)
+            regular, _ = generate_weighted_random(
+                frequency_dataframe, use_hot_cold=True
+            )
             weighted_samples.extend(regular)
 
         # Generate samples without weighting
         regular_samples = []
         for _ in range(100):
-            regular, _ = generate_weighted_random(frequency_dataframe, use_hot_cold=False)
+            regular, _ = generate_weighted_random(
+                frequency_dataframe, use_hot_cold=False
+            )
             regular_samples.extend(regular)
 
         # The weighted samples should show bias toward number 1

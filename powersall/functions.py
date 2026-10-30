@@ -1,15 +1,14 @@
-import markovify
-import random
-import json
 import datetime
-import pandas as pd
+import json
+import random
 from collections import Counter
-import numpy as np
+
+import markovify
 
 
 def markover(data):
     """Takes in data list of strings."""
-    fixeddata = '\n'.join(map(str, data))
+    fixeddata = "\n".join(map(str, data))
     text_model = markovify.NewlineText(fixeddata)
     return text_model.make_sentence()
 
@@ -23,11 +22,14 @@ def randomeyes(db=False):
             selection[counter] = selected
         else:
             return randomeyes()
-    selection['powerball'] = random.randint(1, 26)
+    selection["powerball"] = random.randint(1, 26)
     if db:
         outjson = {}
-        outjson['results'] = selection
-        with open(f'selection_{datetime.datetime.now().strftime("%m-%d-%y-%h-%m-%s")}.json', 'w+') as f:
+        outjson["results"] = selection
+        with open(
+            f"selection_{datetime.datetime.now().strftime('%m-%d-%y-%h-%m-%s')}.json",
+            "w+",
+        ) as f:
             f.write(json.dumps(outjson))
     return selection
 
@@ -39,11 +41,11 @@ def analyze_frequency(df):
 
     # Regular numbers (1-69)
     regular_numbers = []
-    for col in ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5']:
+    for col in ["choice 1", "choice 2", "choice 3", "choice 4", "choice 5"]:
         regular_numbers.extend(df[col].tolist())
 
     regular_freq = Counter(regular_numbers)
-    powerball_freq = Counter(df['Powerball'].tolist())
+    powerball_freq = Counter(df["Powerball"].tolist())
 
     print("\nMost Common Regular Numbers (1-69):")
     for num, freq in regular_freq.most_common(10):
@@ -55,12 +57,12 @@ def analyze_frequency(df):
         percentage = (freq / len(df)) * 100
         print(f"  {num:2d}: {freq:3d} times ({percentage:5.1f}%)")
 
-    print(f"\nLeast Common Regular Numbers (1-69):")
+    print("\nLeast Common Regular Numbers (1-69):")
     for num, freq in regular_freq.most_common()[-10:]:
         percentage = (freq / len(df)) * 100
         print(f"  {num:2d}: {freq:3d} times ({percentage:5.1f}%)")
 
-    print(f"\nLeast Common Powerballs (1-26):")
+    print("\nLeast Common Powerballs (1-26):")
     for num, freq in powerball_freq.most_common()[-10:]:
         percentage = (freq / len(df)) * 100
         print(f"  {num:2d}: {freq:3d} times ({percentage:5.1f}%)")
@@ -76,19 +78,19 @@ def get_hot_cold_numbers(df, recent_games=50):
 
     # Regular numbers
     recent_regular = []
-    for col in ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5']:
+    for col in ["choice 1", "choice 2", "choice 3", "choice 4", "choice 5"]:
         recent_regular.extend(recent_df[col].tolist())
 
     recent_regular_freq = Counter(recent_regular)
-    recent_powerball_freq = Counter(recent_df['Powerball'].tolist())
+    recent_powerball_freq = Counter(recent_df["Powerball"].tolist())
 
     # All-time frequencies for comparison
     all_regular = []
-    for col in ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5']:
+    for col in ["choice 1", "choice 2", "choice 3", "choice 4", "choice 5"]:
         all_regular.extend(df[col].tolist())
 
     all_regular_freq = Counter(all_regular)
-    all_powerball_freq = Counter(df['Powerball'].tolist())
+    all_powerball_freq = Counter(df["Powerball"].tolist())
 
     print(f"\nHot Regular Numbers (last {recent_games} games):")
     hot_regular = [num for num, _ in recent_regular_freq.most_common(10)]
@@ -135,8 +137,14 @@ def detect_patterns(df):
     odd_even_patterns = []
 
     for _, row in df.iterrows():
-        numbers = [row['choice 1'], row['choice 2'], row['choice 3'],
-                  row['choice 4'], row['choice 5'], row['Powerball']]
+        numbers = [
+            row["choice 1"],
+            row["choice 2"],
+            row["choice 3"],
+            row["choice 4"],
+            row["choice 5"],
+            row["Powerball"],
+        ]
         odd_count = sum(1 for num in numbers[:-1] if num % 2 == 1)
         even_count = 5 - odd_count
         powerball_odd = numbers[-1] % 2 == 1
@@ -157,22 +165,36 @@ def detect_patterns(df):
     print("\nSum Pattern Analysis (regular numbers):")
     sums = []
     for _, row in df.iterrows():
-        numbers = [row['choice 1'], row['choice 2'], row['choice 3'],
-                  row['choice 4'], row['choice 5']]
+        numbers = [
+            row["choice 1"],
+            row["choice 2"],
+            row["choice 3"],
+            row["choice 4"],
+            row["choice 5"],
+        ]
         sums.append(sum(numbers))
 
     sum_ranges = [(0, 100), (101, 150), (151, 200), (201, 250), (251, 350)]
     for range_min, range_max in sum_ranges:
         count = sum(1 for s in sums if range_min <= s <= range_max)
         percentage = (count / total_draws) * 100
-        print(f"  Sum {range_min:3d}-{range_max:3d}: {count:3d} times ({percentage:5.1f}%)")
+        print(
+            f"  Sum {range_min:3d}-{range_max:3d}: {count:3d} times ({percentage:5.1f}%)"
+        )
 
     # Analyze consecutive numbers
     print("\nConsecutive Numbers Analysis:")
     consecutive_counts = []
     for _, row in df.iterrows():
-        numbers = sorted([row['choice 1'], row['choice 2'], row['choice 3'],
-                         row['choice 4'], row['choice 5']])
+        numbers = sorted(
+            [
+                row["choice 1"],
+                row["choice 2"],
+                row["choice 3"],
+                row["choice 4"],
+                row["choice 5"],
+            ]
+        )
         consecutive = 0
         for i in range(len(numbers) - 1):
             if numbers[i + 1] - numbers[i] == 1:
@@ -193,7 +215,7 @@ def generate_weighted_random(df, use_hot_cold=False, recent_games=100):
 
         # Get recent frequencies
         recent_regular = []
-        for col in ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5']:
+        for col in ["choice 1", "choice 2", "choice 3", "choice 4", "choice 5"]:
             recent_regular.extend(recent_df[col].tolist())
 
         recent_freq = Counter(recent_regular)

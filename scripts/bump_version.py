@@ -18,7 +18,7 @@ def get_current_version():
     """Get current version from pyproject.toml"""
     pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
 
-    with open(pyproject_path, 'r') as f:
+    with open(pyproject_path) as f:
         content = f.read()
 
     version_match = re.search(r'version = "([^"]+)"', content)
@@ -30,13 +30,13 @@ def get_current_version():
 
 def bump_version(current_version, bump_type):
     """Bump version according to semver rules"""
-    major, minor, patch = map(int, current_version.split('.'))
+    major, minor, patch = map(int, current_version.split("."))
 
-    if bump_type == 'major':
+    if bump_type == "major":
         return f"{major + 1}.0.0"
-    elif bump_type == 'minor':
+    elif bump_type == "minor":
         return f"{major}.{minor + 1}.0"
-    elif bump_type == 'patch':
+    elif bump_type == "patch":
         return f"{major}.{minor}.{patch + 1}"
     else:
         raise ValueError(f"Unknown bump type: {bump_type}")
@@ -46,17 +46,15 @@ def update_pyproject_version(new_version):
     """Update version in pyproject.toml"""
     pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
 
-    with open(pyproject_path, 'r') as f:
+    with open(pyproject_path) as f:
         content = f.read()
 
     # Replace version in pyproject.toml
     updated_content = re.sub(
-        r'version = "[^"]+"',
-        f'version = "{new_version}"',
-        content
+        r'version = "[^"]+"', f'version = "{new_version}"', content
     )
 
-    with open(pyproject_path, 'w') as f:
+    with open(pyproject_path, "w") as f:
         f.write(updated_content)
 
     print(f"Updated version to {new_version} in pyproject.toml")
@@ -66,17 +64,15 @@ def update_powersall_version(new_version):
     """Update fallback version in powersall.py"""
     powersall_path = Path(__file__).parent.parent / "powersall" / "powersall.py"
 
-    with open(powersall_path, 'r') as f:
+    with open(powersall_path) as f:
         content = f.read()
 
     # Replace fallback version
     updated_content = re.sub(
-        r'__version__ = "[\d\.]+"',
-        f'__version__ = "{new_version}"',
-        content
+        r'__version__ = "[\d\.]+"', f'__version__ = "{new_version}"', content
     )
 
-    with open(powersall_path, 'w') as f:
+    with open(powersall_path, "w") as f:
         f.write(updated_content)
 
     print(f"Updated fallback version to {new_version} in powersall.py")
@@ -85,15 +81,12 @@ def update_powersall_version(new_version):
 def main():
     parser = argparse.ArgumentParser(description="Bump version for powersall")
     parser.add_argument(
-        'version_type',
-        choices=['major', 'minor', 'patch'],
-        nargs='?',
-        help='Type of version bump (major, minor, patch)'
+        "version_type",
+        choices=["major", "minor", "patch"],
+        nargs="?",
+        help="Type of version bump (major, minor, patch)",
     )
-    parser.add_argument(
-        '--set',
-        help='Set specific version (e.g., 2.1.0)'
-    )
+    parser.add_argument("--set", help="Set specific version (e.g., 2.1.0)")
 
     args = parser.parse_args()
 
@@ -117,9 +110,11 @@ def main():
 
         print(f"\nVersion bumped to {new_version}")
         print("Don't forget to:")
-        print(f"  1. Commit these changes: git add . && git commit -m 'Bump version to {new_version}'")
+        print(
+            f"  1. Commit these changes: git add . && git commit -m 'Bump version to {new_version}'"
+        )
         print(f"  2. Tag the release: git tag v{new_version}")
-        print(f"  3. Push changes and tags: git push && git push --tags")
+        print("  3. Push changes and tags: git push && git push --tags")
 
     except Exception as e:
         print(f"Error: {e}")

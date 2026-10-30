@@ -1,28 +1,36 @@
 """Advanced Powerball lottery analysis and number generator tool."""
-import pandas as pd
-from bs4 import BeautifulSoup
-import requests
-import csv
+
 import argparse
-from pathlib import Path
+import csv
 import datetime
-import json
-import numpy as np
 from collections import Counter
-from .functions import randomeyes, analyze_frequency, get_hot_cold_numbers, detect_patterns
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+from .functions import (
+    analyze_frequency,
+    detect_patterns,
+    get_hot_cold_numbers,
+    randomeyes,
+)
 
 try:
     from importlib.metadata import version
+
     __version__ = version("powersall")
 except ImportError:
     # Fallback for older Python versions or development
-    __version__ = "2.0.0"
+    __version__ = "2.0.4"
 
 
 def prep():
     """Get all the argparse stuff setup."""
     parser = argparse.ArgumentParser(
-        description='Advanced Powerball lottery analysis and number generator',
+        description="Advanced Powerball lottery analysis and number generator",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -32,49 +40,85 @@ Examples:
   powersall --hot-cold           # Show hot/cold numbers
   powersall --patterns           # Show pattern analysis
   powersall --web                # Launch web interface
-        """)
-    parser.add_argument('-d', '--date', dest='powerdate',
-                        help='yyyy-mm-dd', default='2019-01-19',
-                        required=False)
-    parser.add_argument('-p', '--pick', dest='pick',
-                        help='pick your next powerball card',
-                        action="store_true", default=False)
-    parser.add_argument('-s', '--save-db', dest='db',
-                        action="store_true", default=False)
-    parser.add_argument('-a', '--analysis', dest='analysis',
-                        help='show frequency analysis',
-                        action="store_true", default=False)
-    parser.add_argument('-hc', '--hot-cold', dest='hot_cold',
-                        help='show hot/cold number analysis',
-                        action="store_true", default=False)
-    parser.add_argument('-pt', '--patterns', dest='patterns',
-                        help='show pattern analysis',
-                        action="store_true", default=False)
-    parser.add_argument('-w', '--web', dest='web',
-                        help='launch web interface',
-                        action="store_true", default=False)
-    parser.add_argument('-v', '--visualize', dest='visualize',
-                        help='create interactive visualizations',
-                        action="store_true", default=False)
+        """,
+    )
+    parser.add_argument(
+        "-d",
+        "--date",
+        dest="powerdate",
+        help="yyyy-mm-dd",
+        default="2019-01-19",
+        required=False,
+    )
+    parser.add_argument(
+        "-p",
+        "--pick",
+        dest="pick",
+        help="pick your next powerball card",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-s", "--save-db", dest="db", action="store_true", default=False
+    )
+    parser.add_argument(
+        "-a",
+        "--analysis",
+        dest="analysis",
+        help="show frequency analysis",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-hc",
+        "--hot-cold",
+        dest="hot_cold",
+        help="show hot/cold number analysis",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-pt",
+        "--patterns",
+        dest="patterns",
+        help="show pattern analysis",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-w",
+        "--web",
+        dest="web",
+        help="launch web interface",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-v",
+        "--visualize",
+        dest="visualize",
+        help="create interactive visualizations",
+        action="store_true",
+        default=False,
+    )
     args = parser.parse_args()
     return args
 
 
 def checkdate(powerdate):
     """Date parsing."""
-    userinput = datetime.datetime.strptime(powerdate, '%Y-%m-%d')
-    datedata = pd.read_csv(
-        f'{Path.home()}/powerball.csv', sep=",")['Date'].tolist()
+    userinput = datetime.datetime.strptime(powerdate, "%Y-%m-%d")
+    datedata = pd.read_csv(f"{Path.home()}/powerball.csv", sep=",")["Date"].tolist()
     realdatelist = []
     for item in datedata:
         # Handle both old format (%d-%B-%Y) and new format (%Y-%m-%d)
         try:
             # Try new format first (YYYY-MM-DD)
-            realdatelist.append(datetime.datetime.strptime(str(item), '%Y-%m-%d'))
+            realdatelist.append(datetime.datetime.strptime(str(item), "%Y-%m-%d"))
         except ValueError:
             try:
                 # Fall back to old format (DD-MMM-YYYY)
-                realdatelist.append(datetime.datetime.strptime(str(item), '%d-%B-%Y'))
+                realdatelist.append(datetime.datetime.strptime(str(item), "%d-%B-%Y"))
             except ValueError:
                 # Skip invalid dates
                 continue
@@ -88,12 +132,12 @@ def getnumbers():
     try:
         # Add headers to avoid being blocked
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
         response = requests.get(
             "https://www.lottonumbers.com/powerball/past-numbers",
             headers=headers,
-            timeout=10
+            timeout=10,
         )
         response.raise_for_status()  # Raise an exception for bad status codes
 
@@ -109,13 +153,23 @@ def getnumbers():
     powerballs = []
     regballs = []
     totals = []
-    dates = []
 
-    with open(f'{Path.home()}/powerball.csv', 'w+', newline='') as csvfile:
-        spamwriter = csv.writer(csvfile, delimiter=',',
-                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow(["Date", "choice 1", "choice 2",
-                             "choice 3", "choice 4", "choice 5", "Powerball", "PowerPlay"])
+    with open(f"{Path.home()}/powerball.csv", "w+", newline="") as csvfile:
+        spamwriter = csv.writer(
+            csvfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+        )
+        spamwriter.writerow(
+            [
+                "Date",
+                "choice 1",
+                "choice 2",
+                "choice 3",
+                "choice 4",
+                "choice 5",
+                "Powerball",
+                "PowerPlay",
+            ]
+        )
 
         # Find the results table
         results_table = soup.find("table", class_="past-results")
@@ -144,19 +198,27 @@ def getnumbers():
                 if len(date_parts) < 4:
                     continue
 
-                day_name = date_parts[0]
                 month_name = date_parts[1]
                 day_num = date_parts[2]
                 year = date_parts[3]
 
                 # Convert month name to number
                 month_map = {
-                    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-                    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-                    'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+                    "Jan": "01",
+                    "Feb": "02",
+                    "Mar": "03",
+                    "Apr": "04",
+                    "May": "05",
+                    "Jun": "06",
+                    "Jul": "07",
+                    "Aug": "08",
+                    "Sep": "09",
+                    "Oct": "10",
+                    "Nov": "11",
+                    "Dec": "12",
                 }
 
-                month_num = month_map.get(month_name, '01')
+                month_num = month_map.get(month_name, "01")
 
                 # Handle single digit days
                 if len(day_num) == 1:
@@ -164,7 +226,7 @@ def getnumbers():
 
                 datefixer = f"{year}-{month_num}-{day_num}"
 
-            except (AttributeError, IndexError, KeyError, ValueError) as e:
+            except (AttributeError, IndexError, KeyError, ValueError):
                 # Skip malformed date rows
                 continue
 
@@ -219,7 +281,7 @@ def getnumbers():
                 # For compatibility with old format
                 totals.append(sum(regular_balls))
 
-            except (AttributeError, IndexError, ValueError) as e:
+            except (AttributeError, IndexError, ValueError):
                 # Skip malformed number rows
                 continue
 
@@ -229,21 +291,21 @@ def getnumbers():
 
 def getplot(data, name):
     """Plot data."""
-    import numpy as np
     from matplotlib import pyplot as plt
+
     data = np.array(data)
 
     # fixed bin size
     bins = np.arange(-100, 100, 5)  # fixed bin size
 
-    plt.xlim([min(data)-0, max(data)+0])
+    plt.xlim([min(data) - 0, max(data) + 0])
 
     plt.hist(data, bins=bins, alpha=0.5)
-    plt.title('Distribution of balls selected (non-powerball) and powerballs')
-    plt.xlabel('variable X (bin size = 5)')
-    plt.ylabel('count')
+    plt.title("Distribution of balls selected (non-powerball) and powerballs")
+    plt.xlabel("variable X (bin size = 5)")
+    plt.ylabel("count")
 
-    plt.savefig(f'{name}.png', bbox_inches='tight')
+    plt.savefig(f"{name}.png", bbox_inches="tight")
     plt.close()
 
 
@@ -251,51 +313,65 @@ def create_visualizations(df):
     """Create interactive visualizations using plotly."""
     try:
         import plotly.graph_objects as go
-        import plotly.express as px
         from plotly.subplots import make_subplots
 
         # Prepare data
         regular_numbers = []
-        for col in ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5']:
+        for col in ["choice 1", "choice 2", "choice 3", "choice 4", "choice 5"]:
             regular_numbers.extend(df[col].tolist())
 
         # Create frequency analysis
         regular_freq = Counter(regular_numbers)
-        powerball_freq = Counter(df['Powerball'].tolist())
+        powerball_freq = Counter(df["Powerball"].tolist())
 
         # Create subplots
         fig = make_subplots(
-            rows=2, cols=2,
-            subplot_titles=('Regular Numbers Frequency', 'Powerball Frequency',
-                          'Regular Numbers Distribution', 'Powerball Distribution'),
-            specs=[[{"type": "bar"}, {"type": "bar"}],
-                   [{"type": "histogram"}, {"type": "histogram"}]]
+            rows=2,
+            cols=2,
+            subplot_titles=(
+                "Regular Numbers Frequency",
+                "Powerball Frequency",
+                "Regular Numbers Distribution",
+                "Powerball Distribution",
+            ),
+            specs=[
+                [{"type": "bar"}, {"type": "bar"}],
+                [{"type": "histogram"}, {"type": "histogram"}],
+            ],
         )
 
         # Regular numbers frequency
         fig.add_trace(
-            go.Bar(x=list(regular_freq.keys()), y=list(regular_freq.values()),
-                  name="Regular Numbers"),
-            row=1, col=1
+            go.Bar(
+                x=list(regular_freq.keys()),
+                y=list(regular_freq.values()),
+                name="Regular Numbers",
+            ),
+            row=1,
+            col=1,
         )
 
         # Powerball frequency
         fig.add_trace(
-            go.Bar(x=list(powerball_freq.keys()), y=list(powerball_freq.values()),
-                  name="Powerball"),
-            row=1, col=2
+            go.Bar(
+                x=list(powerball_freq.keys()),
+                y=list(powerball_freq.values()),
+                name="Powerball",
+            ),
+            row=1,
+            col=2,
         )
 
         # Regular numbers histogram
         fig.add_trace(
-            go.Histogram(x=regular_numbers, name="Regular Distribution"),
-            row=2, col=1
+            go.Histogram(x=regular_numbers, name="Regular Distribution"), row=2, col=1
         )
 
         # Powerball histogram
         fig.add_trace(
-            go.Histogram(x=df['Powerball'].tolist(), name="Powerball Distribution"),
-            row=2, col=2
+            go.Histogram(x=df["Powerball"].tolist(), name="Powerball Distribution"),
+            row=2,
+            col=2,
         )
 
         fig.update_layout(height=800, title_text="Powerball Analysis Dashboard")
@@ -309,11 +385,9 @@ def create_visualizations(df):
 def launch_web_interface(df):
     """Launch a web interface for interactive analysis."""
     try:
-        import streamlit as st
-
         # Create a simple streamlit app
-        with open('powerball_app.py', 'w') as f:
-            f.write('''
+        with open("powerball_app.py", "w") as f:
+            f.write("""
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -370,7 +444,7 @@ with tab2:
 
     fig4 = px.histogram(df['Powerball'].tolist(), title="Powerball Distribution")
     st.plotly_chart(fig4)
-''')
+""")
 
         print("Streamlit app created: powerball_app.py")
         print("Run with: streamlit run powerball_app.py")
@@ -386,26 +460,36 @@ with tab2:
 def main():
     """Main function for Powerball analysis tool."""
     args = prep()
-    my_file = Path(f'{Path.home()}/powerball.csv')
+    my_file = Path(f"{Path.home()}/powerball.csv")
 
     # Load data if it exists, otherwise fetch it
     if not my_file.is_file():
         print("Downloading Powerball data...")
         getnumbers()
 
-    df = pd.read_csv(f'{Path.home()}/powerball.csv', sep=",", dtype=str)
+    df = pd.read_csv(f"{Path.home()}/powerball.csv", sep=",", dtype=str)
 
     # Convert numeric columns to integers for analysis
-    numeric_columns = ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5', 'Powerball', 'PowerPlay']
+    numeric_columns = [
+        "choice 1",
+        "choice 2",
+        "choice 3",
+        "choice 4",
+        "choice 5",
+        "Powerball",
+        "PowerPlay",
+    ]
     for col in numeric_columns:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Handle different modes
     if args.pick:
         result = randomeyes(args.db)
         print("Your Powerball numbers:")
-        print(f"Regular numbers: {', '.join(map(str, [result[i] for i in range(1, 6)]))}")
+        print(
+            f"Regular numbers: {', '.join(map(str, [result[i] for i in range(1, 6)]))}"
+        )
         print(f"Powerball: {result['powerball']}")
         return
 
@@ -435,12 +519,14 @@ def main():
         # Search for the date in YYYY-MM-DD format (new format)
         target_date = userdate.strftime("%Y-%m-%d")
         # Ensure Date column is treated as string for pattern matching
-        result = df[df['Date'].astype(str).str.contains(target_date)]
+        result = df[df["Date"].astype(str).str.contains(target_date)]
         if result.empty:
             print(f"No data found for date: {args.powerdate}")
             print("Available dates range from the data in powerball.csv")
             # Show available dates for debugging
-            available_dates = df['Date'].astype(str).unique()[:10]  # Show first 10 dates
+            available_dates = (
+                df["Date"].astype(str).unique()[:10]
+            )  # Show first 10 dates
             print(f"Available date formats: {available_dates}")
         else:
             print(f"Powerball numbers for {args.powerdate}:")
@@ -448,11 +534,13 @@ def main():
 
         # Show some basic analysis
         regular_numbers = []
-        for col in ['choice 1', 'choice 2', 'choice 3', 'choice 4', 'choice 5']:
+        for col in ["choice 1", "choice 2", "choice 3", "choice 4", "choice 5"]:
             regular_numbers.extend(df[col].tolist())
 
-        print(f"\nBasic Statistics:")
-        print(f"Most common regular number: {Counter(regular_numbers).most_common(1)[0]}")
+        print("\nBasic Statistics:")
+        print(
+            f"Most common regular number: {Counter(regular_numbers).most_common(1)[0]}"
+        )
         print(f"Most common Powerball: {df['Powerball'].mode().iloc[0]}")
 
     except ValueError as e:
